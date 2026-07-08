@@ -732,6 +732,7 @@ AS '$libdir/pgnodemx', 'pgnodemx_permute_list'
 LANGUAGE C STABLE STRICT;
 */
 /* function return signatures */
+extern Oid cg_text_sig[];
 Oid cg_text_sig[] = {TEXTOID};
 /* debug function */
 PG_FUNCTION_INFO_V1(pgnodemx_permute_list);

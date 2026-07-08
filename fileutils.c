@@ -58,6 +58,7 @@
 #include "fileutils.h"
 #include "genutils.h"
 
+extern uint64	magic_ids[];
 uint64	magic_ids[] =
 	{ADFS_SUPER_MAGIC,AFFS_SUPER_MAGIC,AFS_SUPER_MAGIC,
 	 ANON_INODE_FS_MAGIC,AUTOFS_SUPER_MAGIC,BDEVFS_MAGIC,
@@ -87,6 +88,7 @@ uint64	magic_ids[] =
 	 XENFS_SUPER_MAGIC,XFS_SUPER_MAGIC,0};
 
 /* keep in sync with magic_ids above */
+extern char   *magic_names[];
 char   *magic_names[] =
 	{"adfs","affs","afs",
 	 "anon_inode_fs","autofs","bdevfs",
@@ -116,10 +118,12 @@ char   *magic_names[] =
 	 "xenfs","xfs",NULL};
 
 /* possible mount flags */
+extern uint64	mflags[];
 uint64	mflags[] =
 	{ST_MANDLOCK,ST_NOATIME,ST_NODEV,ST_NODIRATIME,ST_NOEXEC,
 	 ST_NOSUID,ST_RDONLY,ST_RELATIME,ST_SYNCHRONOUS,0};
 /* keep in sync with mflags above */
+extern char   *mflagnames[];
 char   *mflagnames[] =
 	{"mandlock","noatime","nodev","nodiratime","noexec",
 	 "nosuid","rdonly","relatime","synchronous",NULL};
@@ -225,7 +229,6 @@ char *
 read_vfs(char *filename)
 {
 	char		   *buf;
-	size_t			nbytes = 0;
 	FILE		   *file;
 	StringInfoData	sbuf;
 
@@ -272,7 +275,6 @@ read_vfs(char *filename)
 		rbytes = fread(sbuf.data + sbuf.len, 1,
 					   (size_t) (sbuf.maxlen - sbuf.len - 1), file);
 		sbuf.len += rbytes;
-		nbytes += rbytes;
 	}
 
 	/*

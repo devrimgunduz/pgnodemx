@@ -136,6 +136,7 @@ Datum pgnodemx_envvar_bigint(PG_FUNCTION_ARGS);
 Datum pgnodemx_kdapi_setof_kv(PG_FUNCTION_ARGS);
 Datum pgnodemx_kdapi_scalar_bigint(PG_FUNCTION_ARGS);
 
+extern bool proc_enabled;
 bool proc_enabled = false;
 
 /*
