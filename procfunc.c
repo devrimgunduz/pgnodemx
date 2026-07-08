@@ -408,9 +408,14 @@ Datum
 pgnodemx_fsinfo(PG_FUNCTION_ARGS)
 {
 	int		nrow;
-	int		ncol;
+	int		ncol = 13;
 	char ***values;
-	char   *pname = text_to_cstring(PG_GETARG_TEXT_PP(0));
+	char   *pname;
+
+	/* Limit use to members of special role, same as pgnodemx_stat_file() */
+	pgnodemx_check_role();
+
+	pname = text_to_cstring(PG_GETARG_TEXT_PP(0));
 
 	if (!proc_enabled)
 		return form_srf(fcinfo, NULL, 0, ncol, _2_numeric_text_9_numeric_text_sig);
@@ -667,6 +672,11 @@ Datum pgnodemx_proc_pid_stat(PG_FUNCTION_ARGS)
 			/* Find end position of the command string */
 			ptr2 = strrchr(rawstr, ch2 );
 
+			if (ptr1 == NULL || ptr2 == NULL || ptr2 < ptr1)
+				ereport(ERROR,
+						(errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
+						errmsg("pgnodemx: malformed line in file %s", fname->data)));
+
 			/*
 			 * The rest of the line starts 2 bytes after
 			 * the command ending parenthesis
@@ -756,8 +766,6 @@ get_uid_username( char *pid, char **uid, char **username )
 	if (stat(tmp, &stat_struct) < 0)
 	{
 		elog(ERROR, "'%s' not found", tmp);
-		*uid = pstrdup("-1");
-		*username = NULL;
 	}
 	else
 	{

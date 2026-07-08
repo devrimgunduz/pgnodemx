@@ -236,16 +236,21 @@ set_containerized(void)
 					char   *line = lines[i];
 					char   *p = strchr(line, ':');
 
+					/* skip malformed lines lacking the expected colon */
+					if (!p)
+						continue;
+
 					/* advance past the colon */
-					if (p)
-						p += 1;
+					p += 1;
 
 					if (strncmp(p, DEFCONTROLLER, 6) == 0)
 					{
 						p = strchr(p, ':');
+						/* skip malformed lines lacking the second colon */
+						if (!p)
+							continue;
 						/* advance past the colon and "/" */
-						if (p)
-							p += 2;
+						p += 2;
 
 						appendStringInfo(str, "%s/%s/%s", cgrouproot, DEFCONTROLLER, p);
 						break;
@@ -739,10 +744,15 @@ PG_FUNCTION_INFO_V1(pgnodemx_permute_list);
 Datum
 pgnodemx_permute_list(PG_FUNCTION_ARGS)
 {
-	char	   *controller = text_to_cstring(PG_GETARG_TEXT_PP(0));
+	char	   *controller;
 	char	 ***values;
 	int			nrow = 0;
 	int			ncol = 1;
+
+	/* Limit use to members of special role */
+	pgnodemx_check_role();
+
+	controller = text_to_cstring(PG_GETARG_TEXT_PP(0));
 
 	values = get_list_permutations(controller, ncol, &nrow);
 	return form_srf(fcinfo, values, nrow, ncol, cg_text_sig);

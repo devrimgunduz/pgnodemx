@@ -187,7 +187,7 @@ parse_quoted_string(char **source)
 	Assert(*source != NULL);
 
 	src = *source;
-	ret = dst = palloc0(strlen(src));
+	ret = dst = palloc0(strlen(src) + 1);
 
 	if (*src && *src == '"')
 		src++;					/* skip leading quote */
@@ -465,7 +465,7 @@ read_kv_file(char *fname, int *nlines)
 {
 	char **lines = read_nlsv(fname, nlines);	
 
-	if (nlines > 0)
+	if (*nlines > 0)
 	{
 		char ***values;
 		int		nrow = *nlines;
